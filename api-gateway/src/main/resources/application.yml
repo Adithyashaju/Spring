@@ -1,0 +1,133 @@
+server:
+  port: 8080
+
+jwt:
+  secret: ${JWT_SECRET:cb2f5c70eafc6989b9755a8d69996727376c5658006b92a0cb4f330bc439e598}
+
+spring:
+  main:
+    web-application-type: reactive
+
+  application:
+    name: api-gateway
+
+  cloud:
+    gateway:
+      globalcors:
+        corsConfigurations:
+          '[/**]':
+            allowedOriginPatterns: "*"
+            allowedMethods: "*"
+            allowedHeaders: "*"
+            allowCredentials: true
+
+      routes:
+
+        # Auth Service
+        - id: auth-service
+          uri: lb://AUTH-SERVICE
+          predicates:
+            - Path=/auth/**
+
+        # Movie Service
+        - id: movie-service
+          uri: lb://MOVIE-SERVICE
+          predicates:
+            - Path=/movies/**
+
+        # Play Service
+        - id: play-service1
+          uri: lb://PLAY-SERVICE1
+          predicates:
+            - Path=/plays/**
+
+        # Booking Service
+        - id: booking-service
+          uri: lb://BOOKING-SERVICE
+          predicates:
+            - Path=/bookings/**
+
+        # Notification Service
+        - id: notification-service
+          uri: lb://NOTIFICATION-SERVICE
+          predicates:
+            - Path=/notify/**
+
+        # Payment Service
+        - id: payment-service
+          uri: lb://PAYMENT-SERVICE
+          predicates:
+            - Path=/payments/**
+
+        # Swagger API Docs routes
+        - id: auth-service-docs
+          uri: lb://AUTH-SERVICE
+          predicates:
+            - Path=/v3/api-docs/auth-service
+          filters:
+            - RewritePath=/v3/api-docs/auth-service, /v3/api-docs
+
+        - id: movie-service-docs
+          uri: lb://MOVIE-SERVICE
+          predicates:
+            - Path=/v3/api-docs/movie-service
+          filters:
+            - RewritePath=/v3/api-docs/movie-service, /v3/api-docs
+
+        - id: play-service-docs
+          uri: lb://PLAY-SERVICE1
+          predicates:
+            - Path=/v3/api-docs/play-service
+          filters:
+            - RewritePath=/v3/api-docs/play-service, /v3/api-docs
+
+        - id: booking-service-docs
+          uri: lb://BOOKING-SERVICE
+          predicates:
+            - Path=/v3/api-docs/booking-service
+          filters:
+            - RewritePath=/v3/api-docs/booking-service, /v3/api-docs
+
+        - id: notification-service-docs
+          uri: lb://NOTIFICATION-SERVICE
+          predicates:
+            - Path=/v3/api-docs/notification-service
+          filters:
+            - RewritePath=/v3/api-docs/notification-service, /v3/api-docs
+
+        - id: payment-service-docs
+          uri: lb://PAYMENT-SERVICE
+          predicates:
+            - Path=/v3/api-docs/payment-service
+          filters:
+            - RewritePath=/v3/api-docs/payment-service, /v3/api-docs
+
+eureka:
+  client:
+    register-with-eureka: true
+    fetch-registry: true
+    service-url:
+      defaultZone: http://localhost:8761/eureka
+
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html
+    urls:
+      - name: Auth Service
+        url: /v3/api-docs/auth-service
+      - name: Movie Service
+        url: /v3/api-docs/movie-service
+      - name: Play Service
+        url: /v3/api-docs/play-service
+      - name: Booking Service
+        url: /v3/api-docs/booking-service
+      - name: Notification Service
+        url: /v3/api-docs/notification-service
+      - name: Payment Service
+        url: /v3/api-docs/payment-service
+    urls-primary-name: Movie Service
+    disable-swagger-default-url: true
+  api-docs:
+    enabled: true
+  cache:
+    disabled: true
